@@ -1,0 +1,126 @@
+<template>
+  <div class="flex h-screen overflow-hidden bg-surface-50">
+    <!-- Sidebar -->
+    <aside
+      :class="[
+        'fixed inset-y-0 left-0 z-40 flex flex-col w-64 bg-surface-0 border-r border-surface-200 transition-transform duration-300',
+        sidebarOpen ? 'translate-x-0' : '-translate-x-full',
+        'lg:relative lg:translate-x-0'
+      ]"
+    >
+      <!-- Logo -->
+      <div class="flex items-center gap-3 px-6 py-5 border-b border-surface-200">
+        <div class="w-8 h-8 bg-brand-600 rounded-xl flex items-center justify-center">
+          <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 9v7.5" />
+          </svg>
+        </div>
+        <span class="font-display font-bold text-lg text-ink tracking-tight">EventBook</span>
+      </div>
+
+      <!-- Navigation -->
+      <nav class="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
+        <RouterLink
+          v-for="item in navItems"
+          :key="item.path"
+          :to="item.path"
+          class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors duration-150"
+          :class="isActive(item.path)
+            ? 'bg-brand-50 text-brand-700'
+            : 'text-ink-muted hover:bg-surface-100 hover:text-ink'"
+          @click="sidebarOpen = false"
+        >
+          <component :is="item.icon" class="w-5 h-5 flex-shrink-0" />
+          {{ item.label }}
+        </RouterLink>
+      </nav>
+
+      <!-- User -->
+      <div class="p-4 border-t border-surface-200">
+        <div class="flex items-center gap-3 px-2">
+          <div class="w-8 h-8 rounded-full bg-brand-100 text-brand-700 flex items-center justify-center text-sm font-bold font-display">
+            {{ auth.user?.name?.charAt(0).toUpperCase() }}
+          </div>
+          <div class="flex-1 min-w-0">
+            <p class="text-sm font-medium text-ink truncate">{{ auth.user?.name }}</p>
+            <p class="text-xs text-ink-faint truncate">{{ auth.user?.role }}</p>
+          </div>
+          <button @click="auth.logout()" class="p-1.5 rounded-lg text-ink-faint hover:bg-surface-100 hover:text-ink transition-colors">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3-3-3h12.75" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Overlay (mobile) -->
+    <div
+      v-if="sidebarOpen"
+      class="fixed inset-0 z-30 bg-ink/30 backdrop-blur-sm lg:hidden"
+      @click="sidebarOpen = false"
+    />
+
+    <!-- Main content -->
+    <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
+      <!-- Topbar -->
+      <header class="flex items-center gap-4 px-6 py-4 bg-surface-0 border-b border-surface-200">
+        <button
+          class="lg:hidden p-2 rounded-lg text-ink-muted hover:bg-surface-100"
+          @click="sidebarOpen = !sidebarOpen"
+        >
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+          </svg>
+        </button>
+        <div class="flex-1" />
+        <RouterLink to="/events/new" class="btn-primary btn-sm hidden sm:inline-flex">
+          <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+          </svg>
+          Buat Event
+        </RouterLink>
+      </header>
+
+      <!-- Page -->
+      <main class="flex-1 overflow-y-auto">
+        <div class="max-w-6xl mx-auto px-6 py-8">
+          <RouterView />
+        </div>
+      </main>
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { ref, h } from 'vue'
+import { useRoute } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
+
+const auth = useAuthStore()
+const route = useRoute()
+const sidebarOpen = ref(false)
+
+const isActive = (path) => route.path.startsWith(path)
+
+const navItems = [
+  {
+    path: '/dashboard',
+    label: 'Dashboard',
+    icon: {
+      render: () => h('svg', { fill: 'none', viewBox: '0 0 24 24', stroke: 'currentColor', 'stroke-width': '1.75' }, [
+        h('path', { 'stroke-linecap': 'round', 'stroke-linejoin': 'round', d: 'M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z' })
+      ])
+    }
+  },
+  {
+    path: '/events',
+    label: 'Events',
+    icon: {
+      render: () => h('svg', { fill: 'none', viewBox: '0 0 24 24', stroke: 'currentColor', 'stroke-width': '1.75' }, [
+        h('path', { 'stroke-linecap': 'round', 'stroke-linejoin': 'round', d: 'M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 9v7.5' })
+      ])
+    }
+  },
+]
+</script>
