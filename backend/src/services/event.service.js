@@ -2,9 +2,10 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
-const getAllEvents = async ({ status, search, page = 1, limit = 10 }) => {
+const getAllEvents = async ({ status, search, page = 1, limit = 10 }, userId, userRole) => {
   const where = {
     AND: [
+      userRole === 'ADMIN' ? {} : { createdBy: userId }, // Admin lihat semua, Organizer lihat miliknya saja
       status ? { status } : {},
       search ? {
         OR: [
@@ -64,32 +65,44 @@ const createEvent = async (data, userId) => {
   });
 };
 
-const updateEvent = async (id, data, userId) => {
+const updateEvent = async (id, data, userId, userRole) => {
   const event = await prisma.event.findUnique({ where: { id } });
   if (!event) throw { status: 404, message: 'Event not found' };
-  if (event.createdBy !== userId) throw { status: 403, message: 'Not authorized' };
+  
+  // Admin bisa edit apa saja, Organizer hanya miliknya sendiri
+  if (userRole !== 'ADMIN' && event.createdBy !== userId) {
+    throw { status: 403, message: 'Not authorized' };
+  }
 
   return prisma.event.update({
     where: { id },
     data: {
       ...data,
-      ...(data.quota && { quota: parseInt(data.quota) }),  // tambah parseInt
+      ...(data.quota && { quota: parseInt(data.quota) }),
       ...(data.date && { date: new Date(data.date) }),
     },
   });
 };
 
-const deleteEvent = async (id, userId) => {
+const deleteEvent = async (id, userId, userRole) => {
   const event = await prisma.event.findUnique({ where: { id } });
   if (!event) throw { status: 404, message: 'Event not found' };
-  if (event.createdBy !== userId) throw { status: 403, message: 'Not authorized' };
+  
+  if (userRole !== 'ADMIN' && event.createdBy !== userId) {
+    throw { status: 403, message: 'Not authorized' };
+  }
+  
+  await prisma.booking.deleteMany({ where: { eventId: id } });
   await prisma.event.delete({ where: { id } });
 };
 
-const getEventParticipants = async (eventId, userId) => {
+const getEventParticipants = async (eventId, userId, userRole) => {
   const event = await prisma.event.findUnique({ where: { id: eventId } });
   if (!event) throw { status: 404, message: 'Event not found' };
-  if (event.createdBy !== userId) throw { status: 403, message: 'Not authorized' };
+  
+  if (userRole !== 'ADMIN' && event.createdBy !== userId) {
+    throw { status: 403, message: 'Not authorized' };
+  }
 
   return prisma.booking.findMany({
     where: { eventId },

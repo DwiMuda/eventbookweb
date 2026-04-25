@@ -5,13 +5,13 @@
       <div v-if="booking" class="space-y-0">
         <!-- Ticket top -->
         <div class="bg-brand-600 rounded-t-3xl px-8 pt-8 pb-6 text-white text-center">
-          <div class="flex items-center justify-center gap-2 mb-6">
-            <div class="w-6 h-6 bg-white/20 rounded-lg flex items-center justify-center">
-              <svg class="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5" />
+          <div class="flex items-center justify-center gap-2.5 mb-6">
+            <div class="w-7 h-7 bg-white/20 rounded-lg flex items-center justify-center">
+              <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 6v.75m0 3v.75m0 3v.75m0 3V18m-9-5.25h5.25M7.5 15h3M3.375 5.25c-.621 0-1.125.504-1.125 1.125v3.026a2.999 2.999 0 010 5.198v3.026c0 .621.504 1.125 1.125 1.125h17.25c.621 0 1.125-.504 1.125-1.125v-3.026a2.999 2.999 0 010-5.198V6.375c0-.621-.504-1.125-1.125-1.125H3.375z" />
               </svg>
             </div>
-            <span class="font-display font-bold text-sm">EventBook</span>
+            <span class="font-display font-bold text-base tracking-tight text-white">Event<span class="opacity-80">Book</span></span>
           </div>
           <AppBadge variant="confirmed" class="mb-4 !bg-white/20 !text-white">
             {{ booking.status === 'CONFIRMED' ? '✓ Terkonfirmasi' : booking.status }}

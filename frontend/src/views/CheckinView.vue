@@ -29,28 +29,54 @@
       </div>
     </div>
 
+    <!-- Hidden element for file scanning -->
+    <div id="qr-reader-hidden" class="hidden"></div>
+
     <!-- Check-in form -->
     <div class="card mb-6">
       <div class="flex items-center justify-between mb-4">
         <h3 class="font-semibold text-sm text-ink">Check-in Peserta</h3>
-        <button 
-          @click="toggleScanner" 
-          class="text-xs font-medium px-2.5 py-1.5 rounded-lg border transition-colors flex items-center gap-1.5"
-          :class="isScanning ? 'bg-red-50 text-red-600 border-red-200 hover:bg-red-100' : 'bg-surface-50 text-ink-muted border-surface-200 hover:bg-surface-100'"
-        >
-          <svg v-if="!isScanning" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" />
-            <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0zM18.75 10.5h.008v.008h-.008V10.5z" />
-          </svg>
-          <span v-else>Tutup Scanner</span>
-          <span v-if="!isScanning">Scan QR</span>
-        </button>
+        <div class="flex gap-2">
+          <!-- Button Scan Kamera -->
+          <button 
+            @click="toggleScanner" 
+            class="text-xs font-medium px-2.5 py-1.5 rounded-lg border transition-colors flex items-center gap-1.5"
+            :class="isScanning ? 'bg-red-50 text-red-600 border-red-200 hover:bg-red-100' : 'bg-surface-50 text-ink-muted border-surface-200 hover:bg-surface-100'"
+          >
+            <svg v-if="!isScanning" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" />
+              <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0zM18.75 10.5h.008v.008h-.008V10.5z" />
+            </svg>
+            <span>{{ isScanning ? 'Tutup' : 'Scan QR' }}</span>
+          </button>
+
+          <!-- Button Upload File -->
+          <button 
+            @click="$refs.fileInput.click()" 
+            class="text-xs font-medium px-2.5 py-1.5 rounded-lg border bg-surface-50 text-ink-muted border-surface-200 hover:bg-surface-100 transition-colors flex items-center gap-1.5"
+          >
+            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12.75a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+            </svg>
+            <span>Pilih Foto</span>
+          </button>
+          <input 
+            type="file" 
+            ref="fileInput" 
+            class="hidden" 
+            accept="image/*" 
+            @change="handleFileUpload"
+          />
+        </div>
       </div>
 
       <!-- QR Scanner Container -->
-      <div v-show="isScanning" class="mb-4 overflow-hidden rounded-xl border border-surface-200 bg-black">
-        <div id="qr-reader"></div>
-      </div>
+      <QrScanner 
+        v-if="isScanning" 
+        @scan="onScanSuccess" 
+        @error="isScanning = false" 
+        class="mb-4" 
+      />
 
       <form @submit.prevent="handleCheckin" class="flex gap-3">
         <input
@@ -112,12 +138,14 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, defineAsyncComponent } from 'vue'
 import { useRoute } from 'vue-router'
 import { checkinApi } from '@/api/index'
 import AppButton from '@/components/ui/AppButton.vue'
 import { format } from 'date-fns'
-import { Html5QrcodeScanner } from 'html5-qrcode'
+import { Html5Qrcode } from 'html5-qrcode'
+
+const QrScanner = defineAsyncComponent(() => import('@/components/chousi/QrScanner.vue'))
 
 const route = useRoute()
 const bookingCode = ref('')
@@ -125,38 +153,48 @@ const loading = ref(false)
 const result = ref(null)
 const stats = ref(null)
 const recentCheckins = ref([])
+const fileInput = ref(null)
 
 const isScanning = ref(false)
-let html5QrcodeScanner = null
 
 const onScanSuccess = (decodedText) => {
   bookingCode.value = decodedText.toUpperCase()
+  isScanning.value = false
   handleCheckin()
-  if (html5QrcodeScanner) {
-    html5QrcodeScanner.clear()
-    isScanning.value = false
-  }
 }
 
 const toggleScanner = () => {
   isScanning.value = !isScanning.value
-  if (isScanning.value) {
-    setTimeout(() => {
-      html5QrcodeScanner = new Html5QrcodeScanner(
-        "qr-reader",
-        { fps: 10, qrbox: { width: 250, height: 250 } },
-        /* verbose= */ false
-      )
-      html5QrcodeScanner.render(onScanSuccess)
-    }, 100)
-  } else {
-    if (html5QrcodeScanner) {
-      html5QrcodeScanner.clear()
+}
+
+const handleFileUpload = async (event) => {
+  const file = event.target.files[0]
+  if (!file) return
+
+  loading.value = true
+  const html5QrCode = new Html5Qrcode("qr-reader-hidden")
+  
+  try {
+    const decodedText = await html5QrCode.scanFile(file, true)
+    bookingCode.value = decodedText.toUpperCase()
+    handleCheckin()
+  } catch (err) {
+    console.error("Error scanning file:", err)
+    result.value = { 
+      success: false, 
+      message: "Tidak dapat menemukan kode QR di foto ini. Pastikan gambar jelas." 
     }
+  } finally {
+    loading.value = false
+    // Reset file input
+    if (fileInput.value) fileInput.value.value = ''
+    // Clean up
+    html5QrCode.clear()
   }
 }
 
 const handleCheckin = async () => {
+  if (!bookingCode.value) return
   loading.value = true
   result.value = null
   try {
@@ -169,6 +207,7 @@ const handleCheckin = async () => {
     })
     if (recentCheckins.value.length > 5) recentCheckins.value.pop()
     bookingCode.value = ''
+    
     // Refresh stats
     const statsRes = await checkinApi.getStats(route.params.id)
     stats.value = statsRes.data.data
@@ -176,18 +215,12 @@ const handleCheckin = async () => {
     result.value = { success: false, message: err.response?.data?.message || 'Check-in gagal' }
   } finally {
     loading.value = false
-    setTimeout(() => result.value = null, 5000)
+    setTimeout(() => { if (result.value?.success) result.value = null }, 5000)
   }
 }
 
 onMounted(async () => {
   const { data } = await checkinApi.getStats(route.params.id)
   stats.value = data.data
-})
-
-onUnmounted(() => {
-  if (html5QrcodeScanner) {
-    html5QrcodeScanner.clear()
-  }
 })
 </script>

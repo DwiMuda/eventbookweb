@@ -53,7 +53,19 @@
         </div>
         <div>
           <p class="text-ink-faint text-xs mb-1 uppercase tracking-wider font-medium">Lokasi</p>
-          <p class="font-medium text-ink truncate">{{ event.location }}</p>
+          <div class="flex items-center gap-2">
+            <p class="font-medium text-ink truncate">{{ event.location }}</p>
+            <a 
+              :href="`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.location)}`" 
+              target="_blank"
+              class="text-brand-600 hover:text-brand-700 p-1 rounded-lg hover:bg-brand-50 transition-colors"
+              title="Buka di Google Maps"
+            >
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+              </svg>
+            </a>
+          </div>
         </div>
         <div>
           <p class="text-ink-faint text-xs mb-1 uppercase tracking-wider font-medium">Kuota</p>
@@ -212,7 +224,7 @@ const handleDelete = async () => {
   deleteLoading.value = true
   try {
     await eventsApi.delete(route.params.id)
-    router.push('/events')
+    router.push('/dashboard')
   } finally {
     deleteLoading.value = false
     showDeleteModal.value = false

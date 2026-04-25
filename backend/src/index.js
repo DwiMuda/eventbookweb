@@ -3,6 +3,7 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
+const compression = require('compression');
 const rateLimit = require('express-rate-limit');
 const authRoutes = require('./routes/auth.routes');
 const eventRoutes = require('./routes/event.routes');
@@ -13,7 +14,8 @@ const dashboardRoutes = require('./routes/dashboard.routes');
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// Security Middleware
+// Middlewares
+app.use(compression());
 app.use(helmet());
 app.use(cors({ origin: process.env.FRONTEND_URL || 'http://localhost:5173' }));
 

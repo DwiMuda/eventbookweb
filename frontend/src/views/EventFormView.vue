@@ -21,9 +21,13 @@
         <AppInput v-model="form.title" label="Judul Event" placeholder="Vue.js Workshop — Bali Tech" :error="errors.title" required />
         <AppInput v-model="form.description" label="Deskripsi" type="textarea" :rows="4" placeholder="Deskripsikan event Anda..." :error="errors.description" required />
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div class="grid grid-cols-1 gap-4">
           <AppInput v-model="form.date" label="Tanggal & Waktu" type="datetime-local" :error="errors.date" required />
-          <AppInput v-model="form.location" label="Lokasi" placeholder="Dojo Bali, Canggu" :error="errors.location" required />
+          <div>
+            <label class="input-label">Lokasi Event</label>
+            <LocationPicker v-model="form.location" />
+            <p v-if="errors.location" class="input-error">{{ errors.location }}</p>
+          </div>
         </div>
       </div>
 
@@ -62,6 +66,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { eventsApi } from '@/api/index'
 import AppInput from '@/components/ui/AppInput.vue'
 import AppButton from '@/components/ui/AppButton.vue'
+import LocationPicker from '@/components/ui/LocationPicker.vue'
 import { format } from 'date-fns'
 
 const route = useRoute()

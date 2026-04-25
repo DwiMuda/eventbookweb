@@ -11,6 +11,7 @@ import client2 from './client'
 export const eventsApi = {
   getAll: (params) => client2.get('/events', { params }),
   getOne: (id) => client2.get(`/events/${id}`),
+  getPublicOne: (id) => client2.get(`/events/public/${id}`),
   create: (data) => client2.post('/events', data),
   update: (id, data) => client2.put(`/events/${id}`, data),
   delete: (id) => client2.delete(`/events/${id}`),
