@@ -8,7 +8,7 @@
         @click.self="$emit('update:modelValue', false)"
       >
         <!-- Backdrop -->
-        <div class="absolute inset-0 bg-ink/40 backdrop-blur-sm" />
+        <div class="absolute inset-0 bg-gray-900/40 backdrop-blur-sm dark:bg-black/60" />
 
         <!-- Panel -->
         <div

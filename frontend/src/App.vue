@@ -5,7 +5,12 @@
 <script setup>
 import { onMounted } from 'vue'
 import { useAuthStore } from '@/stores/auth'
+import { useTheme } from '@/composables/useTheme'
 
 const auth = useAuthStore()
-onMounted(() => auth.fetchUser())
+const { theme } = useTheme()
+
+onMounted(() => {
+  auth.fetchUser()
+})
 </script>

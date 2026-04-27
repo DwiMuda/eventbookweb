@@ -1,5 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 export default {
+  darkMode: 'class',
   content: ['./index.html', './src/**/*.{vue,js,ts}'],
   theme: {
     extend: {
@@ -22,16 +23,16 @@ export default {
           900: '#293386',
         },
         surface: {
-          0: '#ffffff',
-          50: '#f8f9fc',
-          100: '#f1f3f9',
-          200: '#e4e8f2',
-          300: '#d0d7e8',
+          0: 'var(--surface-0)',
+          50: 'var(--surface-50)',
+          100: 'var(--surface-100)',
+          200: 'var(--surface-200)',
+          300: 'var(--surface-300)',
         },
         ink: {
-          DEFAULT: '#111827',
-          muted: '#6b7280',
-          faint: '#9ca3af',
+          DEFAULT: 'var(--ink)',
+          muted: 'var(--ink-muted)',
+          faint: 'var(--ink-faint)',
         },
       },
       borderRadius: {
