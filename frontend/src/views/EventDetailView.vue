@@ -42,48 +42,66 @@
     <!-- Main Dashboard -->
     <div class="grid lg:grid-cols-3 gap-6 mb-8">
       <!-- Info Card -->
-      <div class="lg:col-span-2 bg-surface-0 border border-surface-200 rounded-3xl p-8 shadow-sm">
-        <div class="flex items-start gap-6">
-          <div class="w-14 h-14 rounded-2xl bg-brand-500/10 flex items-center justify-center shrink-0">
-            <svg class="w-7 h-7 text-brand-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5" />
-            </svg>
+      <div class="lg:col-span-2 space-y-6">
+        <div class="bg-surface-0 border border-surface-200 rounded-3xl p-8 shadow-sm">
+          <div class="flex items-start gap-6">
+            <div class="w-14 h-14 rounded-2xl bg-brand-500/10 flex items-center justify-center shrink-0">
+              <svg class="w-7 h-7 text-brand-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5" />
+              </svg>
+            </div>
+            <div class="min-w-0">
+              <AppBadge :variant="event.status.toLowerCase()" dot class="mb-2 font-medium">
+                {{ statusLabel(event.status) }}
+              </AppBadge>
+              <h1 class="text-2xl font-display font-bold text-ink leading-tight mb-2 tracking-tight">{{ event.title }}</h1>
+              <p class="text-sm text-ink-muted leading-relaxed line-clamp-2 opacity-90">{{ event.description }}</p>
+            </div>
           </div>
-          <div class="min-w-0">
-            <AppBadge :variant="event.status.toLowerCase()" dot class="mb-2 font-medium">
-              {{ statusLabel(event.status) }}
-            </AppBadge>
-            <h1 class="text-2xl font-display font-bold text-ink leading-tight mb-2 tracking-tight">{{ event.title }}</h1>
-            <p class="text-sm text-ink-muted leading-relaxed line-clamp-2 opacity-90">{{ event.description }}</p>
+
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-6 mt-10 pt-8 border-t border-surface-100">
+            <div>
+              <p class="text-[10px] font-bold uppercase tracking-wider text-ink-faint mb-1.5">Tanggal</p>
+              <p class="text-sm font-semibold text-ink">{{ formatDate(event.date) }}</p>
+              <p class="text-xs text-ink-muted mt-0.5">{{ formatTime(event.date) }}</p>
+            </div>
+            <div class="min-w-0">
+              <p class="text-[10px] font-bold uppercase tracking-wider text-ink-faint mb-1.5">Lokasi</p>
+              <div class="flex items-center gap-1.5">
+                <p class="text-sm font-semibold text-ink truncate">{{ event.location }}</p>
+                <a :href="`https://maps.google.com/?q=${encodeURIComponent(event.location)}`" target="_blank" class="shrink-0 text-brand-600 opacity-70 hover:opacity-100">
+                  <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+                  </svg>
+                </a>
+              </div>
+            </div>
+            <div>
+              <p class="text-[10px] font-bold uppercase tracking-wider text-ink-faint mb-1.5">Kuota</p>
+              <p class="text-sm font-semibold text-ink">{{ event.quota }} Kursi</p>
+              <p class="text-xs text-ink-muted mt-0.5">{{ event.availableSlots }} Tersedia</p>
+            </div>
+            <div>
+              <p class="text-[10px] font-bold uppercase tracking-wider text-ink-faint mb-1.5">Terisi</p>
+              <p class="text-sm font-semibold text-brand-600">{{ event.bookedCount }} Pendaftar</p>
+              <p class="text-xs text-emerald-600 mt-0.5 font-medium">{{ Math.round(fillPct) }}% Penuh</p>
+            </div>
           </div>
         </div>
 
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-6 mt-10 pt-8 border-t border-surface-100">
-          <div>
-            <p class="text-[10px] font-bold uppercase tracking-wider text-ink-faint mb-1.5">Tanggal</p>
-            <p class="text-sm font-semibold text-ink">{{ formatDate(event.date) }}</p>
-            <p class="text-xs text-ink-muted mt-0.5">{{ formatTime(event.date) }}</p>
-          </div>
-          <div class="min-w-0">
-            <p class="text-[10px] font-bold uppercase tracking-wider text-ink-faint mb-1.5">Lokasi</p>
-            <div class="flex items-center gap-1.5">
-              <p class="text-sm font-semibold text-ink truncate">{{ event.location }}</p>
-              <a :href="`https://maps.google.com/?q=${encodeURIComponent(event.location)}`" target="_blank" class="shrink-0 text-brand-600 opacity-70 hover:opacity-100">
-                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
-                </svg>
-              </a>
-            </div>
-          </div>
-          <div>
-            <p class="text-[10px] font-bold uppercase tracking-wider text-ink-faint mb-1.5">Kuota</p>
-            <p class="text-sm font-semibold text-ink">{{ event.quota }} Kursi</p>
-            <p class="text-xs text-ink-muted mt-0.5">{{ event.availableSlots }} Tersedia</p>
-          </div>
-          <div>
-            <p class="text-[10px] font-bold uppercase tracking-wider text-ink-faint mb-1.5">Terisi</p>
-            <p class="text-sm font-semibold text-brand-600">{{ event.bookedCount }} Pendaftar</p>
-            <p class="text-xs text-emerald-600 mt-0.5 font-medium">{{ Math.round(fillPct) }}% Penuh</p>
+        <!-- Visual Map Card -->
+        <div class="bg-surface-0 border border-surface-200 rounded-3xl overflow-hidden shadow-sm p-2">
+          <div class="w-full h-[250px] rounded-2xl overflow-hidden border border-surface-100 bg-surface-50 group">
+            <iframe
+              width="100%"
+              height="100%"
+              frameborder="0"
+              scrolling="no"
+              marginheight="0"
+              marginwidth="0"
+              class="grayscale-[0.2] contrast-[1.1] group-hover:grayscale-0 transition-all duration-700"
+              :src="`https://maps.google.com/maps?q=${encodeURIComponent(event.location)}&t=&z=15&ie=UTF8&iwloc=&output=embed`"
+            ></iframe>
           </div>
         </div>
       </div>

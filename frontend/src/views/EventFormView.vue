@@ -70,19 +70,11 @@
           </div>
 
           <div class="mt-6">
-            <AppInput
+            <label class="block text-[10px] font-bold uppercase tracking-[0.2em] text-ink-faint mb-3 ml-1">Di Mana Lokasinya?</label>
+            <LocationPicker
               v-model="form.location"
-              label="Di Mana Lokasinya?"
-              placeholder="Nama gedung atau alamat..."
-              required
               :error="errors.location"
-            >
-              <template #prefix>
-                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                </svg>
-              </template>
-            </AppInput>
+            />
           </div>
         </section>
 
@@ -182,6 +174,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { eventsApi } from '@/api/index'
 import AppInput from '@/components/ui/AppInput.vue'
 import AppButton from '@/components/ui/AppButton.vue'
+import LocationPicker from '@/components/ui/LocationPicker.vue'
 
 const route = useRoute()
 const router = useRouter()
